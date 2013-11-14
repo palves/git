@@ -128,6 +128,7 @@ with the following format keys:
   %A - the author email
   %c - the committer name
   %C - the committer email
+  %d - the full commit message (git log --pretty=full)
   %s - the commit summary
 "
   :group 'git-blame)
@@ -401,6 +402,7 @@ See also function `git-blame-mode'."
                        (?A . ,(git-blame-get-info info 'author-mail))
                        (?c . ,(git-blame-get-info info 'committer))
                        (?C . ,(git-blame-get-info info 'committer-mail))
+                       (?d . ,(git-full-commit-log hash))
                        (?s . ,(git-blame-get-info info 'summary)))))
           (push ovl git-blame-overlays)
           (overlay-put ovl 'git-blame info)
@@ -430,6 +432,13 @@ See also function `git-blame-mode'."
     (call-process "git" nil t nil
                   "log" "-1"
 		  (concat "--pretty=" git-blame-log-oneline-format)
+                  hash)
+    (buffer-substring (point-min) (point-max))))
+
+(defun git-full-commit-log (hash)
+  (with-temp-buffer
+    (call-process "git" nil t nil
+                  "log" "-1" "--pretty=full"
                   hash)
     (buffer-substring (point-min) (point-max))))
 
